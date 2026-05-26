@@ -95,6 +95,18 @@ scripts/package-myclash.sh
 - `dist/MyClash.app`
 - `dist/MyClash-<version>-<build>.zip`
 
+打包带拖拽安装界面的 `.dmg`：
+
+```sh
+scripts/package-dmg.sh
+```
+
+如果已经有 `dist/MyClash.app`，可以跳过重新构建 App：
+
+```sh
+MYCLASH_SKIP_APP_BUILD=1 scripts/package-dmg.sh
+```
+
 打包脚本默认使用 ad-hoc 签名。Developer ID 签名和公证参数见 [Packaging/README.md](Packaging/README.md)。
 
 ## 开发 CLI
@@ -153,4 +165,3 @@ MyClash 避免高频忙轮询：
 - 启用系统代理会修改 macOS 网络服务的 HTTP、HTTPS、SOCKS 代理配置。开发调试时如果同时运行 FlClash 或其他代理客户端，不要同时开启多个客户端的系统代理。
 - 当前项目不是完整商业发行包，真实分发前仍需要 Developer ID 签名、公证和更完整的自动更新流程。
 - Sparkle App 更新尚未完成；mihomo core 独立下载、校验和安装能力已落地。
-

@@ -110,6 +110,7 @@ env CLANG_MODULE_CACHE_PATH=/Users/huaiping/code/MyClash/.build/module-cache \
 
 ```sh
 scripts/package-myclash.sh
+scripts/package-dmg.sh
 ```
 
 开发 CLI：
@@ -141,6 +142,7 @@ swift test
 ```sh
 swift build -c release
 scripts/package-myclash.sh
+MYCLASH_SKIP_APP_BUILD=1 scripts/package-dmg.sh
 ```
 
 修改以下模块时建议补充或更新测试：
@@ -182,4 +184,3 @@ App 图标来源：
 
 - Sparkle App 自动更新尚未完成。
 - 真实 Developer ID 签名和 notarytool 公证需要本机证书与 keychain profile。
-
