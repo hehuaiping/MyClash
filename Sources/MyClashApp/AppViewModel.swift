@@ -112,6 +112,19 @@ final class AppViewModel: ObservableObject {
         "↑ \(Self.formatBytes(uploadBytesPerSecond))/s  ↓ \(Self.formatBytes(downloadBytesPerSecond))/s"
     }
 
+    var terminalProxyCommand: String {
+        [
+            "export http_proxy=http://127.0.0.1:9809",
+            "export https_proxy=http://127.0.0.1:9809",
+            "export all_proxy=socks5://127.0.0.1:9809"
+        ].joined(separator: "\n")
+    }
+
+    func copyTerminalProxyCommand() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(terminalProxyCommand, forType: .string)
+    }
+
     var proxyBypassEntries: [String] {
         ProxyBypassRules.normalize(proxyBypassText)
     }

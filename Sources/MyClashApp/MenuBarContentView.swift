@@ -24,6 +24,10 @@ struct MenuBarContentView: View {
                 appModel.toggleSystemProxy()
             }
 
+            Button("复制终端代理命令") {
+                appModel.copyTerminalProxyCommand()
+            }
+
             Picker("模式", selection: $appModel.selectedMode) {
                 Text("Rule").tag("rule")
                 Text("Global").tag("global")
