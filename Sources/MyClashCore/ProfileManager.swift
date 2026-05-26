@@ -642,7 +642,7 @@ public actor ProfileManager {
     }
 
     private static let profileDownloadUserAgents = [
-        "MyClash/v0.1.0 clash-verge Platform/darwin",
+        "MyClash/v0.2.0 clash-verge Platform/darwin",
         "FlClash/v0.8.0 clash-verge Platform/darwin",
         "clash-verge/v2.0.0",
         "mihomo",

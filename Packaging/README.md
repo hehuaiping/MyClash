@@ -23,7 +23,7 @@ scripts/package-myclash.sh
 
 ## Useful variables
 
-- `MYCLASH_VERSION`: app marketing version, default `0.1.0`.
+- `MYCLASH_VERSION`: app marketing version, default `0.2.0`.
 - `MYCLASH_BUILD_NUMBER`: build number, default UTC-like timestamp from the local machine.
 - `MYCLASH_BUNDLE_ID`: bundle identifier, default `com.myclash.desktop`.
 - `MYCLASH_SIGN_IDENTITY`: Developer ID signing identity. Empty means ad-hoc signing unless disabled.
