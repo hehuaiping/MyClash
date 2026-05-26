@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+.swiftpm/
+.myclash-dev/
+dist/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
