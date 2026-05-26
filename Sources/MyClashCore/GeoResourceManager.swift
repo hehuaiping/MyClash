@@ -190,13 +190,17 @@ public struct GeoResourceManager: Sendable {
 
     public static func defaultSearchDirectories() -> [URL] {
         var directories: [URL] = []
-        if let moduleResourceURL = Bundle.module.resourceURL {
-            directories.append(moduleResourceURL.appendingPathComponent("Geo", isDirectory: true))
-            directories.append(moduleResourceURL)
-        }
+
         if let resourceURL = Bundle.main.resourceURL {
-            directories.append(resourceURL.appendingPathComponent("Geo", isDirectory: true))
-            directories.append(resourceURL)
+            appendResourceSearchDirectories(baseURL: resourceURL, to: &directories)
+        }
+        appendResourceSearchDirectories(baseURL: Bundle.main.bundleURL, to: &directories)
+        appendResourceSearchDirectories(baseURL: Bundle.main.bundleURL.deletingLastPathComponent(), to: &directories)
+        if let executablePath = CommandLine.arguments.first, !executablePath.isEmpty {
+            appendResourceSearchDirectories(
+                baseURL: URL(fileURLWithPath: executablePath).deletingLastPathComponent(),
+                to: &directories
+            )
         }
 
         let home = FileManager.default.homeDirectoryForCurrentUser
@@ -204,7 +208,23 @@ public struct GeoResourceManager: Sendable {
         directories.append(home.appendingPathComponent("Library/Application Support/com.follow.clash", isDirectory: true))
         directories.append(home.appendingPathComponent("Library/Application Support/Clash", isDirectory: true))
         directories.append(home.appendingPathComponent("code/FlClash/assets/data", isDirectory: true))
-        return directories
+        return uniqueURLs(directories)
+    }
+
+    private static func appendResourceSearchDirectories(baseURL: URL, to directories: inout [URL]) {
+        let resourceBundleURL = baseURL.appendingPathComponent("MyClash_MyClashCore.bundle", isDirectory: true)
+        directories.append(resourceBundleURL.appendingPathComponent("Geo", isDirectory: true))
+        directories.append(resourceBundleURL)
+        directories.append(baseURL.appendingPathComponent("Geo", isDirectory: true))
+        directories.append(baseURL)
+    }
+
+    private static func uniqueURLs(_ urls: [URL]) -> [URL] {
+        var seen = Set<String>()
+        return urls.filter { url in
+            let key = url.standardizedFileURL.path
+            return seen.insert(key).inserted
+        }
     }
 
     private func status(for definition: GeoResourceDefinition, sourceURL: URL) -> GeoResourceStatus {

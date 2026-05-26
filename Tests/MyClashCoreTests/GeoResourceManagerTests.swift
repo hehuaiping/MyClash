@@ -2,6 +2,12 @@ import XCTest
 @testable import MyClashCore
 
 final class GeoResourceManagerTests: XCTestCase {
+    func testDefaultSearchDirectoriesAvoidSwiftPMBundleTrapAndIncludeResourceBundleName() {
+        let directories = GeoResourceManager.defaultSearchDirectories()
+        XCTAssertFalse(directories.isEmpty)
+        XCTAssertTrue(directories.contains { $0.path.contains("MyClash_MyClashCore.bundle") })
+    }
+
     func testEnsureBundledResourcesCopiesGeoFilesIncludingASN() throws {
         let baseURL = temporaryDirectory()
         let sourceURL = baseURL.appendingPathComponent("source", isDirectory: true)
