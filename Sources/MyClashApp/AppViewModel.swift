@@ -113,11 +113,7 @@ final class AppViewModel: ObservableObject {
     }
 
     var terminalProxyCommand: String {
-        [
-            "export http_proxy=http://127.0.0.1:9809",
-            "export https_proxy=http://127.0.0.1:9809",
-            "export all_proxy=socks5://127.0.0.1:9809"
-        ].joined(separator: "\n")
+        "export http_proxy=http://127.0.0.1:9809 https_proxy=http://127.0.0.1:9809 all_proxy=socks5://127.0.0.1:9809"
     }
 
     func copyTerminalProxyCommand() {
