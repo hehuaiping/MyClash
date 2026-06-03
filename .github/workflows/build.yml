@@ -1,15 +1,9 @@
-name: Build MyClash
+name: Release MyClash
 
 on:
   push:
     branches:
-      - main
-    tags:
-      - "v*"
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+      - "release/*"
 
 permissions:
   contents: read
@@ -69,6 +63,8 @@ jobs:
         run: |
           version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Packaging/Info.plist)"
           echo "MYCLASH_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "MYCLASH_RELEASE_TAG=v${version}-build.${GITHUB_RUN_NUMBER}" >> "${GITHUB_ENV}"
+          echo "MYCLASH_RELEASE_TITLE=MyClash ${version} build ${GITHUB_RUN_NUMBER}" >> "${GITHUB_ENV}"
 
       - name: Cache SwiftPM
         uses: actions/cache@v4
@@ -87,23 +83,43 @@ jobs:
       - name: Build DMG
         run: scripts/package-dmg.sh
 
-      - name: Upload app artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyClash-${{ env.MYCLASH_VERSION }}-${{ env.MYCLASH_BUILD_NUMBER }}
-          path: |
-            dist/MyClash-${{ env.MYCLASH_VERSION }}-${{ env.MYCLASH_BUILD_NUMBER }}.zip
-            dist/MyClash-${{ env.MYCLASH_VERSION }}-${{ env.MYCLASH_BUILD_NUMBER }}.dmg
-          if-no-files-found: error
+      - name: Write release notes
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          cat > release-notes.md <<EOF
+          ## 发布说明
 
-      - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+          本次发布由 \`${GITHUB_REF_NAME}\` 分支提交自动构建生成。
+
+          - 应用版本：\`${MYCLASH_VERSION}\`
+          - 构建号：\`${MYCLASH_BUILD_NUMBER}\`
+          - 发布标签：\`${MYCLASH_RELEASE_TAG}\`
+          - 提交：\`${short_sha}\`
+          - 系统代理端口：\`9809\`
+          - External Controller：\`127.0.0.1:9090\`
+
+          ## 构建产物
+
+          - \`MyClash-${MYCLASH_VERSION}-${MYCLASH_BUILD_NUMBER}.dmg\`
+          - \`MyClash-${MYCLASH_VERSION}-${MYCLASH_BUILD_NUMBER}.zip\`
+
+          ## 安装说明
+
+          下载 DMG 后，将 \`MyClash.app\` 拖入 Applications 文件夹即可安装。
+
+          ## 签名说明
+
+          当前 Actions 构建使用 ad-hoc 签名，未进行 Developer ID 签名和 Apple 公证。
+          EOF
+
+      - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
+          gh release create "${MYCLASH_RELEASE_TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
-            --title "MyClash ${GITHUB_REF_NAME}" \
-            --notes "Automated MyClash build for ${GITHUB_REF_NAME}." \
+            --target "${GITHUB_SHA}" \
+            --title "${MYCLASH_RELEASE_TITLE}" \
+            --notes-file release-notes.md \
             "dist/MyClash-${MYCLASH_VERSION}-${MYCLASH_BUILD_NUMBER}.zip" \
             "dist/MyClash-${MYCLASH_VERSION}-${MYCLASH_BUILD_NUMBER}.dmg"

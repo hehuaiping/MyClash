@@ -113,9 +113,10 @@ MYCLASH_SKIP_APP_BUILD=1 scripts/package-dmg.sh
 
 仓库包含自动构建流水线：[.github/workflows/build.yml](.github/workflows/build.yml)。
 
-- push 到 `main`、创建 PR、手动触发 `workflow_dispatch` 时会运行测试和打包。
-- 产物会上传为 Actions artifact，包括 `.zip` 和 `.dmg`。
-- 推送 `v*` tag 时会额外创建 GitHub Release 并上传同一批产物。
+- push 到 `release/*` 分支时会运行测试和打包。
+- 构建成功后会自动创建 tag，例如 `v0.2.0-build.3`。
+- `.zip` 和 `.dmg` 产物会上传到对应的 GitHub Release。
+- Release note 会包含发布分支、版本号、构建号、提交和安装说明。
 - CI 环境会跳过 Finder 窗口美化步骤，本地运行 `scripts/package-dmg.sh` 时仍会生成带拖拽引导的 DMG 安装界面。
 
 ## 开发 CLI
