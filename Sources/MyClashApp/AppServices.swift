@@ -1,6 +1,6 @@
 import Foundation
 import ServiceManagement
-import UserNotifications
+@preconcurrency import UserNotifications
 
 enum LoginItemStatus: Equatable {
     case enabled
