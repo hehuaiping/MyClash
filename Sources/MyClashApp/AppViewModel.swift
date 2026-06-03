@@ -46,6 +46,7 @@ final class AppViewModel: ObservableObject {
     @Published private(set) var isProfileImportInProgress = false
     @Published private(set) var isCoreUpdateInProgress = false
     @Published private(set) var isDelayTesting = false
+    @Published private(set) var delayTestingNodeIDs: Set<String> = []
     @Published var coreDownloadVersion = "v1.19.24"
     @Published var coreExpectedSHA256 = ""
     @Published var profileImportName = ""
@@ -858,6 +859,17 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func isNodeDelayTesting(_ proxyName: String) -> Bool {
+        delayTestingNodeIDs.contains(proxyName)
+    }
+
+    func testDelayForNode(_ proxyName: String) {
+        Task {
+            await bootstrap()
+            await performSingleNodeDelayTest(proxyName: proxyName)
+        }
+    }
+
     func refreshProxyProvider(name: String) {
         Task {
             await bootstrap()
@@ -1187,10 +1199,49 @@ final class AppViewModel: ObservableObject {
         nodeDelayStatus = "\(title)完成：\(okCount)/\(proxyNames.count) 可用"
     }
 
+    private func performSingleNodeDelayTest(proxyName: String) async {
+        guard let controllerClient else {
+            return
+        }
+        guard isCoreRunning else {
+            nodeDelayStatus = "请先启动代理后再测速"
+            return
+        }
+        let trimmedName = proxyName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, trimmedName != "-" else {
+            nodeDelayStatus = "请选择有效节点测速"
+            return
+        }
+        guard !isDelayTesting, !delayTestingNodeIDs.contains(trimmedName) else {
+            return
+        }
+
+        delayTestingNodeIDs.insert(trimmedName)
+        nodeDelayStatus = "正在测试 \(trimmedName)"
+        applyDelayResults([trimmedName: 0])
+        defer {
+            delayTestingNodeIDs.remove(trimmedName)
+        }
+
+        let delay: Int
+        do {
+            delay = try await controllerClient.proxyDelay(proxyName: trimmedName).delay
+        } catch {
+            delay = -1
+        }
+
+        applyDelayResults([trimmedName: delay])
+        try? await delayCacheStore?.upsert([trimmedName: delay])
+        nodeDelayStatus = delay > 0
+            ? "\(trimmedName) 延迟：\(delay) ms"
+            : "\(trimmedName) 测试超时"
+    }
+
     private func scheduleAutomaticDelayRefreshIfNeeded() {
         guard isCoreRunning,
               visiblePanel == .nodes,
-              !isDelayTesting
+              !isDelayTesting,
+              delayTestingNodeIDs.isEmpty
         else {
             return
         }

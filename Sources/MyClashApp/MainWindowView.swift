@@ -216,6 +216,19 @@ struct NodesView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
+                if appModel.isCoreRunning {
+                    Button {
+                        appModel.testDelayForNode(proxy.name)
+                    } label: {
+                        Label(
+                            appModel.isNodeDelayTesting(proxy.name) ? "测速中" : "测试延迟",
+                            systemImage: appModel.isNodeDelayTesting(proxy.name) ? "hourglass" : "timer"
+                        )
+                    }
+                    .labelStyle(.iconOnly)
+                    .help("测试该节点延迟")
+                    .disabled(appModel.isDelayTesting || appModel.isNodeDelayTesting(proxy.name))
+                }
                 if !proxy.isSelected, appModel.isCoreRunning, let group = appModel.selectedProxyGroup {
                     Button {
                         appModel.selectProxy(groupName: group.name, proxyName: proxy.name)
