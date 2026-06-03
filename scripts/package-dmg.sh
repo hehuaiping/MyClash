@@ -8,6 +8,7 @@ APP_NAME="${MYCLASH_APP_NAME:-MyClash}"
 VERSION="${MYCLASH_VERSION:-0.2.0}"
 BUILD_NUMBER="${MYCLASH_BUILD_NUMBER:-$(date +%Y%m%d%H%M)}"
 SKIP_APP_BUILD="${MYCLASH_SKIP_APP_BUILD:-0}"
+CUSTOMIZE_FINDER="${MYCLASH_DMG_CUSTOMIZE_FINDER:-1}"
 
 DIST_DIR="${REPO_ROOT}/dist"
 APP_BUNDLE="${DIST_DIR}/${APP_NAME}.app"
@@ -175,7 +176,11 @@ create_dmg() {
     -mountpoint "$MOUNT_DIR" >/dev/null
 
   ditto "$DMG_STAGING_DIR" "$MOUNT_DIR"
-  customize_finder_window
+  if [[ "$CUSTOMIZE_FINDER" == "1" ]]; then
+    customize_finder_window
+  else
+    log "skipping Finder window customization"
+  fi
   rm -rf "$MOUNT_DIR/.fseventsd" "$MOUNT_DIR/.Trashes"
   sync
 

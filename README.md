@@ -109,6 +109,15 @@ MYCLASH_SKIP_APP_BUILD=1 scripts/package-dmg.sh
 
 打包脚本默认使用 ad-hoc 签名。Developer ID 签名和公证参数见 [Packaging/README.md](Packaging/README.md)。
 
+## GitHub Actions
+
+仓库包含自动构建流水线：[.github/workflows/build.yml](.github/workflows/build.yml)。
+
+- push 到 `main`、创建 PR、手动触发 `workflow_dispatch` 时会运行测试和打包。
+- 产物会上传为 Actions artifact，包括 `.zip` 和 `.dmg`。
+- 推送 `v*` tag 时会额外创建 GitHub Release 并上传同一批产物。
+- CI 环境会跳过 Finder 窗口美化步骤，本地运行 `scripts/package-dmg.sh` 时仍会生成带拖拽引导的 DMG 安装界面。
+
 ## 开发 CLI
 
 `myclash` 是开发辅助入口：

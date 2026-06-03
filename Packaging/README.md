@@ -10,6 +10,12 @@ scripts/package-myclash.sh
 
 The default build creates `dist/MyClash.app`, applies ad-hoc signing, verifies the signature, and writes a zip archive under `dist/`.
 
+To create a DMG installer with a drag-to-Applications layout:
+
+```sh
+scripts/package-dmg.sh
+```
+
 ## Developer ID package
 
 ```sh
@@ -30,3 +36,4 @@ scripts/package-myclash.sh
 - `MYCLASH_AD_HOC_SIGN`: set to `0` to skip ad-hoc signing when no identity is present.
 - `MYCLASH_NOTARIZE`: set to `1` to submit the zip to Apple notarization.
 - `MYCLASH_NOTARY_PROFILE`: notarytool keychain profile name.
+- `MYCLASH_DMG_CUSTOMIZE_FINDER`: set to `0` to skip Finder window customization for headless CI runners.
